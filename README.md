@@ -8,13 +8,19 @@ This module implements a flexible pipeline processing framework, designed for tr
 **Docker**
 
 ```bash
-docker build -t flexpipe .
+docker build -t flexpipe . --no-cache
 docker run -it --rm flexpipe bash  # debug
 
 docker run -d --name flexpipe_ct flexpipe:latest
 docker stop flexpipe_ct
 docker rm flexpipe_ct
 docker rmi flexpipe
+```
+
+```bash
+rm -rf build dist
+python setup.py sdist bdist_wheel
+python -m twine upload dist/*
 ```
 
 **Table of Contents**

@@ -6,26 +6,39 @@ from pathlib import Path, PosixPath
 from functools import partial
 from datetime import datetime
 import pandas as pd
-
+import traceback
 
 __ALL__ = ["Pipeline", "Tracker", "Transformation"]
 
 
 class Pipeline:
-    def __init__(self, out: Path, steps: list["Transformation"]):
+    def __init__(self, out: Path, steps: list["Transformation"] = None):
         # Initialize the pipeline with output directory and steps (list of transformations)
+        log.info(f"Initializing pipeline at {out}")
         self.out = out
         self.steps = steps
         self.tracker = Tracker(self)
 
-    def start(self):
+    def start(self, *steps: "Transformation"):
         # Start the pipeline by running all transformation steps
+        if len(steps) > 0:
+            self.steps = steps
         for x in self.steps:
             x._run(self)
 
     def clean(self):
         # Clean the pipeline by removing cached files and directories
         self.tracker.clean_all()
+
+    def __enter__(self) -> "Pipeline":
+        return self
+
+    def __exit__(self, exc_type, exc_value, tb):
+        self.clean()
+        if exc_type is not None:
+            traceback.print_exception(exc_type, exc_value, tb)
+            return False
+        return True
 
 
 class Tracker:
@@ -49,10 +62,9 @@ class Tracker:
         for name, infos in self.steps.items():
             if self._meta[name].get("delete_step"):
                 shutil.rmtree(self.out / name)  # Remove the directory for the step
-                log.debug(f"Deleted {self.out/name!r}")
+                log.debug(f"Deleted {str(self.out/name)!r}")
             if self._meta[name].get("df_delete_cache"):
-                end = infos["end"]
-                if x := end.get("df_out_csv"):
+                if x := infos["end"].get("df_out_csv"):
                     removeIfExists(x)  # Remove CSV file if it exists
                     log.debug(f"Deleted CSV {x}")
 
@@ -120,7 +132,16 @@ class Tracker:
         # Retrieve the filename of the last completed dataframe in the pipeline
         for name, infos in reversed(self.steps.items()):
             if infos["end"].get("state") == "done":
-                return infos["end"].get("df_out_csv")
+                if x := infos["end"].get("df_out_csv"):
+                    return x  # last df of all
+        #     if infos["end"].get("state") == "done":
+        #         return infos["end"].get("df_out_csv")  # last step df
+
+    def check_last_step_state(self, tr):
+        for name, infos in reversed(self.steps.items()):
+            if name != tr.__class__.__name__:
+                return infos["end"].get("state") == "done", name
+        return True, None
 
 
 class Transformation:
@@ -145,10 +166,15 @@ class Transformation:
         if skip:
             return  # Skip step if it is lazy and already done
 
+        # Check last step
+        val, last_step = ctx.tracker.check_last_step_state(self)
+        if not val:
+            raise RuntimeError(f"Last step {last_step!r} failed")
+
         # Load the previous dataframe if available
         self.prev_df_fname = ctx.tracker.get_last_df()
         if self.prev_df_fname and os.path.exists(self.prev_df_fname):
-            self.prev_df = pd.read_csv(self.prev_df_fname)
+            self.prev_df = pd.read_csv(self.prev_df_fname, index_col=0)
 
         # Get the filename function for this step
         self.get_fname = partial(ctx.tracker.get_filename, _class=self)

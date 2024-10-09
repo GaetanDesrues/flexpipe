@@ -1,9 +1,8 @@
 import logging
 from pathlib import Path
-from datetime import datetime
 import seaborn as sns
 
-from flexpipe.core import Pipeline, Transformation
+from flexpipe import Pipeline, Transformation
 
 
 class TSnsLoad(Transformation):
@@ -45,7 +44,6 @@ def main():
     x.clean()
 
 
-now = datetime.now
 log = logging.getLogger(__name__)
 
 

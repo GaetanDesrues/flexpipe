@@ -6,3 +6,4 @@ old
 *.egg-info
 build
 dist
+.ipynb*

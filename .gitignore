@@ -1,0 +1,8 @@
+venv
+__pycache__
+.DS_S*
+out
+old
+*.egg-info
+build
+dist

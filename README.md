@@ -5,24 +5,6 @@ This module implements a flexible pipeline processing framework, designed for tr
 **Install**
 `pip install flexpipe`
 
-**Docker**
-
-```bash
-docker build -t flexpipe . --no-cache
-docker run -it --rm flexpipe bash  # debug
-
-docker run -d --name flexpipe_ct flexpipe:latest
-docker stop flexpipe_ct
-docker rm flexpipe_ct
-docker rmi flexpipe
-```
-
-```bash
-rm -rf build dist
-python setup.py sdist bdist_wheel
-python -m twine upload dist/*
-```
-
 **Table of Contents**
 
 1. Pipeline Class
@@ -124,3 +106,23 @@ The logger is instantiated as log and is used to record information such as when
 ## Conclusion
 
 This concludes the documentation for the pipeline processing framework. Each class and function works together to provide a flexible, lazy-execution pipeline with automatic tracking and caching capabilities.
+
+**Docker**
+
+```bash
+docker build -t flexpipe . --no-cache
+docker run -it --rm flexpipe bash  # debug
+
+docker run -d --name flexpipe_ct flexpipe:latest
+docker stop flexpipe_ct
+docker rm flexpipe_ct
+docker rmi flexpipe
+```
+
+**PYPI**
+
+```bash
+rm -rf build dist
+python setup.py sdist bdist_wheel
+python -m twine upload dist/*
+```

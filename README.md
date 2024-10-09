@@ -2,7 +2,20 @@
 
 This module implements a flexible pipeline processing framework, designed for tracking, executing, and managing data transformations. It supports step-by-step execution, lazy execution, caching, and easy output management.
 
+**Install**
 `pip install flexpipe`
+
+**Docker**
+
+```bash
+docker build -t flexpipe .
+docker run -it --rm flexpipe bash  # debug
+
+docker run -d --name flexpipe_ct flexpipe:latest
+docker stop flexpipe_ct
+docker rm flexpipe_ct
+docker rmi flexpipe
+```
 
 **Table of Contents**
 

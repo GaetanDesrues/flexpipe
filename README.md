@@ -5,6 +5,24 @@ This module implements a flexible pipeline processing framework, designed for tr
 **Install**
 `pip install flexpipe`
 
+**Example**
+
+The following will create a `tracker.json` file, as well as the step `MyTransform`:
+
+```python
+from flexpipe import Pipeline, Transformation
+
+class MyTransform(Transformation):
+    def process(self, *args, **kwargs):
+        # You code here
+        pass
+
+with Pipeline("./out_dir") as pipe:
+    pipe.start(
+        MyTransform("my_arg"),
+    )
+```
+
 **Table of Contents**
 
 1. Pipeline Class

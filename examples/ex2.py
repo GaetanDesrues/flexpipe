@@ -31,7 +31,7 @@ class TRenameCols(Transformation):
 
 
 def main():
-    out = Path(__file__).parent / "out"
+    out = Path(__file__).parent / "out_2"
 
     # Test steps
     steps = [

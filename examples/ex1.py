@@ -29,7 +29,7 @@ log = logging.getLogger(__name__)
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
 
-    out = Path(__file__).parent / "out"
+    out = Path(__file__).parent / "out_1"
 
     with Pipeline(out) as x:
         x.start(

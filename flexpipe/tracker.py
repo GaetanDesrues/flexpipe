@@ -31,6 +31,8 @@ class Tracker:
             return
         # Clean all tracked steps, removing specified files and directories
         for name, infos in self.steps.items():
+            if not self._meta.get(name):
+                continue
             if self._meta.get(name).get("delete_step"):
                 if os.path.exists(self.out / name):
                     shutil.rmtree(self.out / name)  # Remove the directory for the step

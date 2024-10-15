@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="flexpipe",
-    version="2.1.000",
+    version="2.2.000",
     author="Gaëtan Desrues",
     description="Flexible Pipeline Processing Framework",
     long_description=long_description,

@@ -10,6 +10,7 @@ from flexpipe.transformation import Transformation
 
 class Pipeline:
     def __init__(self, out: Path, steps: list["Transformation"] = None, logger=None):
+        out.mkdir(exist_ok=True)
         self.out = out
         self.steps = steps
         self.state = "init"
@@ -27,17 +28,17 @@ class Pipeline:
         # Start the pipeline by running all transformation steps
         if len(steps) > 0:
             self.steps = steps
-        valid = True
-        for x in self.steps:
-            self.state = f"step-{x.name}"
-            if valid:
-                valid = x._run(self, ignore_failed) == "done"
-                valid = valid or ignore_failed
-            else:
-                log.error("Stopping pipeline: last step failed.")
-                self.state = "failed"
-                return
-
+        if self.steps is not None:
+            valid = True
+            for x in self.steps:
+                self.state = f"step-{x.name}"
+                if valid:
+                    valid = x._run(self, ignore_failed) == "done"
+                    valid = valid or ignore_failed
+                else:
+                    log.error("Stopping pipeline: last step failed.")
+                    self.state = "failed"
+                    return
         self.state = "finished"
 
     def clean(self):
@@ -65,6 +66,11 @@ class Pipeline:
             level = logger.level
         x.setLevel(level)
         logger.addHandler(x)
+
+    def get_fname(self, step, key):
+        if step in self.tracker.steps:
+            return self.tracker.steps[step]["end"].get(key)
+        log.error(f"({step}, {key}) could not be found")
 
 
 log = logging.getLogger(__name__)
